@@ -10,15 +10,15 @@ int yylex(void);
 %{
 	int next_int_id = 1;
 	map<string, int> int_id;
-	map<string, char> var_type;
+	map<string, string> var_type;
 	string assign_temp;
 %}
 
 %union{
-  int		int_val;
- float		float_val;
-  string*	op_val;
- char*	str_val;
+	int	int_val;
+	float	float_val;
+	string*	op_val;
+	char*	str_val;
 }
 
 %start	input 
@@ -72,33 +72,35 @@ STATEMENT: 	DECLARATION
 		|WHILE		
 		| ASSIGNMENT
 		;
-DECLARATION: 	PRIMITIVE_TYPE id  {var_type[$2] = ($1 == "int" ? 'i' : 'f'); int_id[$2] = next_int_id++;cout<<"out: "<<$2<<"="<<next_int_id-1<<endl;}Semi
+DECLARATION: 	PRIMITIVE_TYPE id{var_type[$2] = $1; int_id[$2] = next_int_id++;cout<<$1<<": "<<$2<<"="<<next_int_id-1<<endl;}Semi
 		;
-PRIMITIVE_TYPE: T_int	{$$=$1;}
-		| T_float{$$=$1;}
+PRIMITIVE_TYPE: T_int	{$$="i";}
+		| T_float{$$="f";}
 		;
-IF :	 	T_if OPEN EXPRESSION CLOSE Openbracket STATEMENT Closebracket T_else Openbracket STATEMENT Closebracket
+IF :	 	T_if OPEN EXPRESSION CLOSE Openbracket 
+		STATEMENT 
+		Closebracket
+		T_else Openbracket STATEMENT Closebracket
 		;
 WHILE : 	T_while OPEN EXPRESSION CLOSE Openbracket STATEMENT Closebracket
 		;
-ASSIGNMENT: 	id{assign_temp = $1;}assign EXPRESSION Semi{cout << "istore_" << int_id[assign_temp] << "\n"; }
+ASSIGNMENT: 	id assign EXPRESSION Semi{cout<<var_type[$1]<< "store_" << int_id[$1] << "\n"; }
 		;
 EXPRESSION: 	SIMPLE_EXPRESSION
 		| SIMPLE_EXPRESSION relop SIMPLE_EXPRESSION
 		;
 SIMPLE_EXPRESSION: TERM
 		| Minus TERM
-		| SIMPLE_EXPRESSION Plus TERM{cout<<"iadd"<<endl;}
-		| SIMPLE_EXPRESSION Minus TERM{cout<<"isub"<<endl;}
+		| SIMPLE_EXPRESSION Plus TERM{cout<<$3<<"add"<<endl;$$=$3;}
+		| SIMPLE_EXPRESSION Minus TERM{cout<<$3<<"sub"<<endl;$$=$3;}
 		;
 TERM: 		FACTOR
-		| TERM Mul FACTOR{cout<<"imul"<<endl;}
-		| TERM Mul FACTOR{cout<<"idiv"<<endl;}
+		| TERM Mul FACTOR{cout<<$3<<"mul"<<endl;$$=$3;}
+		| TERM Div FACTOR{cout<<$3<<"div"<<endl;$$=$3;}
 		;
-FACTOR: 	id{cout << "iload_" << int_id[$1] << "\n"; }
-		| num{cout<<"iconst_"<<$1<<endl;} | OPEN EXPRESSION CLOSE;
+FACTOR: 	id{cout<<var_type[$1]<< "load_" << int_id[$1] << "\n";$$=new char[100];strcpy($$,var_type[$1].c_str());}
+		| num{cout<<"iconst_"<<$1<<endl;$$="i";} | OPEN EXPRESSION CLOSE;
 %%
-
 int yyerror(string s)
 {
   extern int yylineno;	// defined and maintained in lex.c
@@ -108,10 +110,7 @@ int yyerror(string s)
   cerr << "\" on line " << yylineno << endl;
   exit(1);
 }
-
 int yyerror(char *s)
 {
   return yyerror(string(s));
 }
-
-
