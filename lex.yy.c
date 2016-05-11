@@ -821,37 +821,37 @@ YY_RULE_SETUP
 case 11:
 YY_RULE_SETUP
 #line 25 "calc.lex"
-{ yylval.str_val = yytext; return T_boolean;}
+{ yylval.str_val = strdup(yytext); return T_boolean;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 26 "calc.lex"
-{ yylval.str_val = yytext; return T_int;}
+{ yylval.str_val = strdup(yytext); return T_int;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 27 "calc.lex"
-{ yylval.str_val = yytext; return T_float;}
+{ yylval.str_val = strdup(yytext); return T_float;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 28 "calc.lex"
-{ yylval.str_val = yytext; return T_if;}
+{ yylval.str_val = strdup(yytext); return T_if;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 29 "calc.lex"
-{ yylval.str_val = yytext; return T_else;}
+{ yylval.str_val = strdup(yytext); return T_else;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 30 "calc.lex"
-{ yylval.str_val = yytext; return T_while;}
+{ yylval.str_val = strdup(yytext); return T_while;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 31 "calc.lex"
-{ yylval.str_val = yytext; return assign;}
+{ yylval.str_val = strdup(yytext); return assign;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
@@ -861,12 +861,12 @@ YY_RULE_SETUP
 case 19:
 YY_RULE_SETUP
 #line 33 "calc.lex"
-{ yylval.str_val = yytext; return id;}
+{ yylval.str_val = strdup(yytext); return id;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 34 "calc.lex"
-{ yylval.str_val = yytext; return relop;}
+{ yylval.str_val = strdup(yytext); return relop;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
@@ -886,7 +886,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 41 "calc.lex"
+#line 40 "calc.lex"
 ECHO;
 	YY_BREAK
 #line 893 "lex.yy.c"
@@ -1887,4 +1887,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 41 "calc.lex"
+#line 40 "calc.lex"

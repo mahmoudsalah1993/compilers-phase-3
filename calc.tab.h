@@ -47,26 +47,24 @@ extern int yydebug;
   {
     id = 258,
     num = 259,
-    addop = 260,
-    mulop = 261,
-    relop = 262,
-    T_float = 263,
-    T_int = 264,
-    Plus = 265,
-    Mul = 266,
-    Minus = 267,
-    Div = 268,
-    OPEN = 269,
-    CLOSE = 270,
-    T_boolean = 271,
-    T_if = 272,
-    T_else = 273,
-    T_while = 274,
-    assign = 275,
-    Semi = 276,
-    Comma = 277,
-    Openbracket = 278,
-    Closebracket = 279
+    relop = 260,
+    T_float = 261,
+    T_int = 262,
+    Plus = 263,
+    Mul = 264,
+    Minus = 265,
+    Div = 266,
+    OPEN = 267,
+    CLOSE = 268,
+    T_boolean = 269,
+    T_if = 270,
+    T_else = 271,
+    T_while = 272,
+    assign = 273,
+    Semi = 274,
+    Comma = 275,
+    Openbracket = 276,
+    Closebracket = 277
   };
 #endif
 
@@ -75,14 +73,14 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 16 "calc.y" /* yacc.c:1909  */
+#line 31 "calc.y" /* yacc.c:1909  */
 
-  int		int_val;
- float		float_val;
-  string*	op_val;
- char*	str_val;
+	int	int_val;
+	float	float_val;
+	string*	op_val;
+	char*	str_val;
 
-#line 86 "calc.tab.h" /* yacc.c:1909  */
+#line 84 "calc.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

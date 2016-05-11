@@ -2,6 +2,6 @@
 
 #define YY_NO_UNPUT
 
-#include <bits/stdc++.h>
 using namespace std;
+#include <bits/stdc++.h>
 

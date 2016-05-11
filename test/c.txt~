@@ -1,0 +1,7 @@
+       0: ldc           #2                  // float 5.5f
+       2: fstore_1      
+       3: ldc           #3                  // float 5.7f
+       5: fstore_1      
+       6: ldc           #2                  // float 5.5f
+       8: fstore_2      
+       9: return      
