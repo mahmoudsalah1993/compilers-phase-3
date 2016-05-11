@@ -190,6 +190,7 @@ void modify_goto(){
 	code[i].second += tostr(else_addr);
 }
 void print_all_code(){
+	freopen("output.j","w",stdout);
 	cout<<"\nStart"<<endl;
 	for(auto a: code){
 		cout<<a.first<<": "<<a.second<<endl;	
