@@ -14,8 +14,10 @@ int yylex(void);
 	map<string, int> int_id;
 	map<string, string> var_type;
 	string assign_temp;
-
 	vector<pair<int, string>> code;
+	bool eval=false;
+	bool neg=false;
+
 	void calc_if_address();
 	void add_code(string s, int len);
 	string add_string(string a, string b);
@@ -26,6 +28,8 @@ int yylex(void);
 	void print_all_code();
 	void modify_while();
 	char* add_constant(float f);
+	float evaluate(string s1,string s2, string op);
+	string adjust_code();
 %}
 
 %union{
@@ -104,7 +108,7 @@ EXPRESSION: 	SIMPLE_EXPRESSION
 		| SIMPLE_EXPRESSION relop SIMPLE_EXPRESSION{$$=$2;}
 		;
 SIMPLE_EXPRESSION: TERM
-		| Minus TERM
+		| Minus {neg=true;} TERM {if(neg) add_code(add_string($3, "neg"), 1);neg=false;$$=$3;}
 		| SIMPLE_EXPRESSION Plus TERM{add_code(add_string($3, "add"), 1);$$=$3;}
 		| SIMPLE_EXPRESSION Minus TERM{add_code(add_string($3, "sub"), 1);$$=$3;}
 		;
@@ -130,9 +134,35 @@ int yyerror(char *s)
 }
 
 void add_code(string s, int len){
-	code.push_back(make_pair(pc, s)); 
-	cout << pc <<": "<< s << "\n";
-	pc += len;
+	if((s.substr(0,6)=="iconst"||s.substr(0,6)=="bipush"||s.substr(0,3)=="ldc")&&(code.size()!=0)){
+		if(code.back().second.substr(0,6)=="iconst"||code.back().second.substr(0,6)=="bipush"||code.back().second.substr(0,3)=="ldc"){
+			eval=true;
+		}
+		
+	}
+	if((s.substr(1,4)=="add"||s.substr(1,4)=="sub"||s.substr(1,4)=="mul"||s.substr(1,4)=="div")&&eval){
+
+		string s1=adjust_code();
+		string s2=adjust_code();		
+		eval=false;
+
+		if(s1.substr(0,3)=="ldc"){
+			if(s2.substr(0,3)=="ldc")
+				add_constant(evaluate(s2.substr(4,s2.size()),s1.substr(4,s1.size()),s.substr(1,4)));
+			else
+				add_constant(evaluate(s2.substr(7,s2.size()),s1.substr(4,s1.size()),s.substr(1,4)));			
+		}
+		else if(s2.substr(0,3)=="ldc")
+			add_constant(evaluate(s2.substr(4,s2.size()),s1.substr(7,s1.size()),s.substr(1,4)));			
+		else
+			add_constant(evaluate(s2.substr(7,s2.size()),s1.substr(7,s1.size()),s.substr(1,4)));
+	}
+	else{
+		code.push_back(make_pair(pc, s)); 
+		cout << pc <<": "<< s << "\n";
+		pc += len;
+	}
+	
 }
 
 string add_string(string a, string b){
@@ -193,6 +223,7 @@ void print_all_code(){
 	freopen("output.j","w",stdout);
 	cout<<"\nStart"<<endl;
 	for(auto a: code){
+		
 		cout<<a.first<<": "<<a.second<<endl;	
 	}
 	cout<<pc<<": return"<<endl;
@@ -205,7 +236,11 @@ void modify_while(){
 }
 
 char* add_constant(float f){
-	if(floor(f)!=f){
+	if(neg){
+		f=-f;
+		neg=false;
+	}
+	if(floor(f)!=f||floor(-f)!=f){
 		add_code(add_string("ldc\t", tostr(f)), 2);		
 		return "f";
 	}
@@ -219,3 +254,31 @@ char* add_constant(float f){
 		return "i";		
 	}
 }
+
+
+float evaluate(string s1,string s2, string op){
+	float a=stof(s1);
+	float b=stof(s2);
+	if(op=="add")
+		return a+b;
+	else if(op=="sub")
+		return a-b;
+	else if(op=="mul")
+		return a*b;
+	else if(op=="div")
+		return a/b;
+}
+
+string adjust_code(){
+	string s=code.back().second;
+		if(s.substr(0,6)=="iconst")
+			pc -=1;
+		else
+			pc -=2;
+		code.pop_back();
+	return s;
+}
+
+
+
+

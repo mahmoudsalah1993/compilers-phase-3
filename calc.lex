@@ -6,7 +6,7 @@ int yyerror(char *s);
 digit		[0-9]
 digits		{digit}+
 id		[a-zA-Z][0-9a-zA-Z]*
-relop		"=="|">="|"<="|">|<"|"!="
+relop		"=="|">="|"<="|">"|"<"|"!="
 num		[0-9]+|[0-9]+"."[0-9]+
 addop		"+"|"-"
 mulop		"*"|"/"
