@@ -132,7 +132,6 @@ int yyerror(char *s)
 {
   return yyerror(string(s));
 }
-
 void add_code(string s, int len){
 	if((s.substr(0,6)=="iconst"||s.substr(0,6)=="bipush"||s.substr(0,3)=="ldc")&&(code.size()!=0)){
 		if(code.back().second.substr(0,6)=="iconst"||code.back().second.substr(0,6)=="bipush"||code.back().second.substr(0,3)=="ldc"){
@@ -141,11 +140,9 @@ void add_code(string s, int len){
 		
 	}
 	if((s.substr(1,4)=="add"||s.substr(1,4)=="sub"||s.substr(1,4)=="mul"||s.substr(1,4)=="div")&&eval){
-
 		string s1=adjust_code();
 		string s2=adjust_code();		
 		eval=false;
-
 		if(s1.substr(0,3)=="ldc"){
 			if(s2.substr(0,3)=="ldc")
 				add_constant(evaluate(s2.substr(4,s2.size()),s1.substr(4,s1.size()),s.substr(1,4)));
@@ -164,7 +161,6 @@ void add_code(string s, int len){
 	}
 	
 }
-
 string add_string(string a, string b){
 	stringstream ss;
 	ss << a << b;
@@ -186,12 +182,10 @@ void calc_if_address(){
 	while(i >= 0 && code[i].second.substr(0, 2) != "if"){
 		i--;
 	}
-
 	code[i].second += "\t";
 	
 	code[i].second += tostr(else_addr);
 }
-
 string get_if(string s){
 	if(s == "<")
 		return "if_icmpge";
@@ -205,17 +199,14 @@ string get_if(string s){
 		return "if_acmpne";
 	if(s == "!=")
 		return "if_acmpeq";
-
 	return "BAD_STRING";
 }
-
 void modify_goto(){
 	int else_addr = pc;
 	int i = code.size() - 2;
 	while(i >= 0 && code[i].second != "goto"){
 		i--;
 	}
-
 	code[i].second += "\t";
 	code[i].second += tostr(else_addr);
 }
@@ -234,13 +225,12 @@ void modify_while(){
 	code[i].second += "\t";
 	code[i].second += tostr(while_addr);
 }
-
 char* add_constant(float f){
 	if(neg){
 		f=-f;
 		neg=false;
 	}
-	if(floor(f)!=f||floor(-f)!=f){
+	if(floor(f)!=f){
 		add_code(add_string("ldc\t", tostr(f)), 2);		
 		return "f";
 	}
@@ -254,8 +244,6 @@ char* add_constant(float f){
 		return "i";		
 	}
 }
-
-
 float evaluate(string s1,string s2, string op){
 	float a=stof(s1);
 	float b=stof(s2);
@@ -268,7 +256,6 @@ float evaluate(string s1,string s2, string op){
 	else if(op=="div")
 		return a/b;
 }
-
 string adjust_code(){
 	string s=code.back().second;
 		if(s.substr(0,6)=="iconst")
@@ -278,7 +265,3 @@ string adjust_code(){
 		code.pop_back();
 	return s;
 }
-
-
-
-
