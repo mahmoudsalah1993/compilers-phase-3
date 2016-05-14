@@ -102,7 +102,8 @@ WHILE : 	T_while{temp_pc=pc;} OPEN EXPRESSION CLOSE Openbracket {add_code(get_if
 		STATEMENT 
 		Closebracket{add_code("goto", 3); calc_if_address();modify_while();}
 		;
-ASSIGNMENT: 	id assign EXPRESSION Semi{add_code(add_string(add_string(var_type[$1], "store_") ,tostr(int_id[$1])), 1); }
+ASSIGNMENT: 	id assign EXPRESSION Semi{string l = "store_"; if(int_id[$1] > 3) l = "store\t";
+					add_code(add_string(var_type[$1]+ l ,tostr(int_id[$1])), 1); }
 		;
 EXPRESSION: 	SIMPLE_EXPRESSION
 		| SIMPLE_EXPRESSION relop SIMPLE_EXPRESSION{$$=$2;}
@@ -116,7 +117,9 @@ TERM: 		FACTOR
 		| TERM Mul FACTOR{add_code(add_string($3, "mul"), 1);$$=$3;}
 		| TERM Div FACTOR{add_code(add_string($3, "div"), 1);$$=$3;}
 		;
-FACTOR: 	id{add_code(add_string(var_type[$1] + "load_",tostr(int_id[$1])), 1);$$=new char[100];strcpy($$,var_type[$1].c_str());}
+FACTOR: 	id{string l = "load_"; if(int_id[$1] > 3) l = "load\t";
+				add_code(add_string(var_type[$1] + l,tostr(int_id[$1])), 1);
+				$$=new char[100];strcpy($$,var_type[$1].c_str());}
 		| num{$$=add_constant($1);} | OPEN EXPRESSION CLOSE;
 %%
 int yyerror(string s)
@@ -156,7 +159,7 @@ void add_code(string s, int len){
 	}
 	else{
 		code.push_back(make_pair(pc, s)); 
-		cout << pc <<": "<< s << "\n";
+		//cout << pc <<": "<< s << "\n";
 		pc += len;
 	}
 	
@@ -265,3 +268,4 @@ string adjust_code(){
 		code.pop_back();
 	return s;
 }
+
