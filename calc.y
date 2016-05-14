@@ -94,7 +94,7 @@ DECLARATION: 	PRIMITIVE_TYPE id{var_type[$2] = $1; int_id[$2] = next_int_id++;}S
 PRIMITIVE_TYPE: T_int	{$$="i";}
 		| T_float{$$="f";}
 		;
-IF :	 	T_if OPEN EXPRESSION CLOSE Openbracket {add_code(get_if($3), 3);} 
+IF :	 	T_if OPEN EXPRESSION CLOSE Openbracket {if(type=="f"){add_code("fcmpg",1);};add_code(get_if($3), 3);} 
 		STATEMENT 
 		Closebracket
 		T_else {add_code("goto", 3); calc_if_address();} Openbracket STATEMENT Closebracket {modify_goto();}
@@ -248,37 +248,26 @@ void modify_while(){
 	code[i].second += tostr(while_addr);
 }
 char* add_constant(float f){
-	if(neg){
+	if(neg)
 		f=-f;
+	
+	if (type=="i"){
+		if(f <= 5 && f>=0){
+			add_code(add_string("iconst_", tostr(floor(f))), 1);
+		}
+		else {
+			if(neg)
+				add_code(add_string("bipush\t-", tostr(floor(-f))), 2);
+			else
+				add_code(add_string("bipush\t", tostr(floor(f))), 2);
+		}
 		neg=false;
-		if(floor(-f)!=f){
-			add_code(add_string("ldc\t", tostr(f)), 2);		
-			return "f";
-		}
-		else{
-			if(-f <= 5 && -f>=0){
-			add_code(add_string("iconst_", tostr(f)), 1);
-		}
-		else {
-			add_code(add_string("bipush\t", tostr(f)), 2);
-		}
-		return "i";	
-		}
+		return "i";
 	}
-	else{
-		if(floor(f)!=f){
-			add_code(add_string("ldc\t", tostr(f)), 2);		
-			return "f";
-		}
-		else {
-			if(f <= 5 && f>=0){
-				add_code(add_string("iconst_", tostr(f)), 1);
-			}
-			else {
-				add_code(add_string("bipush\t", tostr(f)), 2);
-			}
-			return "i";		
-		}
+	else if(type=="f"){
+		add_code(add_string("ldc\t", tostr(f)), 2);	
+		neg=false;	
+		return "f";
 	}
 }
 float evaluate(string s1,string s2, string op){
