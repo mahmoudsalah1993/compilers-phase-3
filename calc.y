@@ -17,7 +17,8 @@ int yylex(void);
 	vector<pair<int, string>> code;
 	bool eval=false;
 	bool neg=false;
-
+	string type;
+	
 	void calc_if_address();
 	void add_code(string s, int len);
 	string add_string(string a, string b);
@@ -119,7 +120,7 @@ TERM: 		FACTOR
 		;
 FACTOR: 	id{string l = "load_"; if(int_id[$1] > 3) l = "load\t";
 				add_code(add_string(var_type[$1] + l,tostr(int_id[$1])), 1);
-				$$=new char[100];strcpy($$,var_type[$1].c_str());}
+				$$=new char[100];strcpy($$,var_type[$1].c_str()); type=var_type[$1];}
 		| num{$$=add_constant($1);} | OPEN EXPRESSION CLOSE;
 %%
 int yyerror(string s)
@@ -190,18 +191,36 @@ void calc_if_address(){
 	code[i].second += tostr(else_addr);
 }
 string get_if(string s){
-	if(s == "<")
-		return "if_icmpge";
-	if(s == ">")
-		return "if_icmple";
-	if(s == ">=")
-		return "if_icmplt";
-	if(s == "<=")
-		return "if_icmpgt";		
-	if(s == "==")
-		return "if_acmpne";
-	if(s == "!=")
-		return "if_acmpeq";
+	if(type=="i"){
+		if(s == "<")
+			return "if_icmpge";
+		if(s == ">")
+			return "if_icmple";
+		if(s == ">=")
+			return "if_icmplt";
+		if(s == "<=")
+			return "if_icmpgt";		
+		if(s == "==")
+			return "if_acmpne";
+		if(s == "!=")
+			return "if_acmpeq";
+	}
+	if(type=="f"){
+	
+		if(s == "<")
+			return "ifge";
+		if(s == ">")
+			return "ifle";
+		if(s == ">=")
+			return "iflt";
+		if(s == "<=")
+			return "ifgt";				
+		if(s == "==")
+			return "ifne";
+		if(s == "!=")
+			return "ifeq";
+	}
+
 	return "BAD_STRING";
 }
 void modify_goto(){
@@ -232,19 +251,34 @@ char* add_constant(float f){
 	if(neg){
 		f=-f;
 		neg=false;
-	}
-	if(floor(f)!=f){
-		add_code(add_string("ldc\t", tostr(f)), 2);		
-		return "f";
-	}
-	else {
-		if(f <= 5 && f>=0){
+		if(floor(-f)!=f){
+			add_code(add_string("ldc\t", tostr(f)), 2);		
+			return "f";
+		}
+		else{
+			if(-f <= 5 && -f>=0){
 			add_code(add_string("iconst_", tostr(f)), 1);
 		}
 		else {
 			add_code(add_string("bipush\t", tostr(f)), 2);
 		}
-		return "i";		
+		return "i";	
+		}
+	}
+	else{
+		if(floor(f)!=f){
+			add_code(add_string("ldc\t", tostr(f)), 2);		
+			return "f";
+		}
+		else {
+			if(f <= 5 && f>=0){
+				add_code(add_string("iconst_", tostr(f)), 1);
+			}
+			else {
+				add_code(add_string("bipush\t", tostr(f)), 2);
+			}
+			return "i";		
+		}
 	}
 }
 float evaluate(string s1,string s2, string op){
