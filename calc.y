@@ -94,7 +94,7 @@ DECLARATION: 	PRIMITIVE_TYPE id{var_type[$2] = $1; int_id[$2] = next_int_id++;}S
 PRIMITIVE_TYPE: T_int	{$$="i";}
 		| T_float{$$="f";}
 		;
-IF :	 	T_if OPEN EXPRESSION CLOSE Openbracket {if(type=="f"){add_code("fcmpg",1);};add_code(get_if($3), 3);} 
+IF :	 	T_if OPEN EXPRESSION CLOSE Openbracket {add_code(get_if($3), 3);} 
 		STATEMENT 
 		Closebracket
 		T_else {add_code("goto", 3); calc_if_address();} Openbracket STATEMENT Closebracket {modify_goto();}
@@ -206,6 +206,10 @@ string get_if(string s){
 			return "if_acmpeq";
 	}
 	if(type=="f"){
+		if(s=="<"||s=="<=")
+			add_code("fcmpg",1);
+		else
+			add_code("fcmpl",1);
 	
 		if(s == "<")
 			return "ifge";
