@@ -103,7 +103,7 @@ WHILE : 	T_while{temp_pc=pc;} OPEN EXPRESSION CLOSE Openbracket {add_code(get_if
 		STATEMENT 
 		Closebracket{add_code("goto", 3); calc_if_address();modify_while();}
 		;
-ASSIGNMENT: 	id assign EXPRESSION Semi{string l = "store_"; if(int_id[$1] > 3) l = "store\t";
+ASSIGNMENT: 	id {type=var_type[$1];}assign EXPRESSION Semi{string l = "store_"; if(int_id[$1] > 3) l = "store\t";
 					add_code(add_string(var_type[$1]+ l ,tostr(int_id[$1])), 1); }
 		;
 EXPRESSION: 	SIMPLE_EXPRESSION
